@@ -38,10 +38,8 @@ venv.bak/
 .DS_Store
 Thumbs.db
 
-# Models (large binaries - use Git LFS or upload directly to host)
-models/*.pkl
+# Models (small enough to commit: total ~20MB)
+# models/*.pkl
 
 # Logs
 *.log
-
-
