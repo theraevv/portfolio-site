@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mental Health Awareness</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .feature-card { border: 1px solid var(--line); background: #111; border-radius: 14px; padding: 1rem; }
+      .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.7rem; }
+      input, select, button { padding: 0.6rem; border-radius: 8px; border: 1px solid #303030; background: #0e0e0e; color: var(--text); font: inherit; }
+      button { width: 100%; margin-top: 0.8rem; background: #1b1b1b; cursor: pointer; }
+      .result { margin-top: 0.8rem; color: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <div class="grain"></div>
+    <header class="site-header">
+      <a href="./index.html" class="brand">Your Name</a>
+      <nav class="main-nav">
+        <a href="./index.html">Home</a>
+        <a href="./projects.html">Projects</a>
+        <a href="./about.html">About</a>
+      </nav>
+    </header>
+    <main>
+      <section class="section hero">
+        <p class="tag">Featured Work</p>
+        <a href="./projects.html" class="back-btn">← Back to Projects</a>
+        <h1>Mental Health Awareness</h1>
+        <p class="lead">Predict depression, anxiety, and burnout indicators from daily patterns.</p>
+      </section>
+      <section class="section">
+        <div class="feature-card">
+          <div class="grid">
+        <input id="Age" type="number" placeholder="Age (years)" />
+        <select id="Gender"><option>Male</option><option>Female</option></select>
+        <select id="Occupation"><option>Student</option><option>Employed</option><option>Unemployed</option></select>
+        <input id="Daily_Screen_Time" type="number" step="0.1" placeholder="Daily Screen Time (hours/day)" />
+        <input id="Social_Media_Usage" type="number" step="0.1" placeholder="Social Media Usage (hours/day)" />
+        <select id="Night_Usage"><option value="1">Yes</option><option value="0">No</option></select>
+        <input id="Sleep_Hours" type="number" step="0.1" placeholder="Sleep Hours (hours/night)" />
+        <input id="Stress_Level" type="number" step="1" placeholder="Stress Level (0-10)" />
+        <input id="Work_Study_Hours" type="number" step="0.1" placeholder="Work/Study Hours (hours/day)" />
+        <select id="Physical_Activity"><option>Low</option><option>Medium</option><option>High</option></select>
+        <input id="Social_Interaction_Score" type="number" step="1" placeholder="Social Interaction Score (0-10)" />
+        <input id="Caffeine_Intake" type="number" step="1" placeholder="Caffeine Intake (cups/day)" />
+        <select id="Smoking"><option value="">Select...</option><option value="No">No</option><option value="Yes">Yes</option></select>
+        <select id="Alcohol"><option value="">Select...</option><option value="No">No</option><option value="Yes">Yes</option></select>
+          </div>
+          <button id="predictBtn">Run Assessment</button>
+          <div id="result" class="result"></div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">© <span id="year"></span> Your Name</footer>
+    <script src="./script.js"></script>
+    <script>
+      const fields = ["Age","Gender","Occupation","Daily_Screen_Time","Social_Media_Usage","Night_Usage","Sleep_Hours","Stress_Level","Work_Study_Hours","Physical_Activity","Social_Interaction_Score","Caffeine_Intake","Smoking","Alcohol"];
+      document.getElementById("predictBtn").addEventListener("click", async () => {
+        const payload = {};
+        fields.forEach((k) => payload[k] = document.getElementById(k).value);
+        ["Age","Daily_Screen_Time","Social_Media_Usage","Night_Usage","Sleep_Hours","Stress_Level","Work_Study_Hours","Social_Interaction_Score","Caffeine_Intake"].forEach((k) => payload[k] = Number(payload[k]));
+        // Convert Yes/No to 1/0 for Smoking and Alcohol
+        payload.Smoking = document.getElementById("Smoking").value === "Yes" ? 1 : 0;
+        payload.Alcohol = document.getElementById("Alcohol").value === "Yes" ? 1 : 0;
+        const resEl = document.getElementById("result");
+        try {
+          const res = await fetch("/api/predict/mental", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Prediction failed");
+          const toYesNo = (v) => v === 1 || v === "1" ? "Yes" : "No";
+          resEl.textContent = `Depression: ${toYesNo(data.depression)} | Anxiety: ${toYesNo(data.anxiety)} | Burnout: ${toYesNo(data.burnout)}`;
+        } catch (e) { resEl.textContent = e.message; }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crop Recommendation</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .feature-card { border: 1px solid var(--line); background: #111; border-radius: 14px; padding: 1rem; }
+      .feature-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+      .feature-grid input, .feature-card button { padding: 0.65rem; border-radius: 10px; border: 1px solid #303030; background: #0e0e0e; color: var(--text); font: inherit; }
+      .feature-card button { width: 100%; margin-top: 0.8rem; background: #1b1b1b; cursor: pointer; }
+      .feature-result { margin-top: 0.8rem; color: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <div class="grain"></div>
+    <header class="site-header">
+      <a href="./index.html" class="brand">Your Name</a>
+      <nav class="main-nav">
+        <a href="./index.html">Home</a>
+        <a href="./projects.html">Projects</a>
+        <a href="./about.html">About</a>
+      </nav>
+    </header>
+    <main>
+      <section class="section hero">
+        <p class="tag">Featured Work</p>
+        <a href="./projects.html" class="back-btn">← Back to Projects</a>
+        <h1>Crop Recommendation</h1>
+        <p class="lead">Predict top crops from soil and climate features.</p>
+      </section>
+      <section class="section">
+        <div class="feature-card">
+          <div class="feature-grid">
+            <input id="N" type="number" placeholder="Nitrogen (N)" />
+            <input id="P" type="number" placeholder="Phosphorus (P)" />
+            <input id="K" type="number" placeholder="Potassium (K)" />
+            <input id="temperature" type="number" step="0.1" placeholder="Temperature (C)" />
+            <input id="humidity" type="number" step="0.1" placeholder="Humidity (%)" />
+            <input id="ph" type="number" step="0.1" placeholder="pH" />
+            <input id="rainfall" type="number" step="0.1" placeholder="Rainfall (mm)" />
+          </div>
+          <button id="predictBtn">Recommend Crop</button>
+          <div id="result" class="feature-result"></div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">© <span id="year"></span> Your Name</footer>
+    <script src="./script.js"></script>
+    <script>
+      document.getElementById("predictBtn").addEventListener("click", async () => {
+        const payload = {
+          N: Number(document.getElementById("N").value),
+          P: Number(document.getElementById("P").value),
+          K: Number(document.getElementById("K").value),
+          temperature: Number(document.getElementById("temperature").value),
+          humidity: Number(document.getElementById("humidity").value),
+          ph: Number(document.getElementById("ph").value),
+          rainfall: Number(document.getElementById("rainfall").value)
+        };
+        const resEl = document.getElementById("result");
+        try {
+          const res = await fetch("/api/predict", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Prediction failed");
+          const rows = (data.results || []).map((r, i) => `#${i + 1} ${r.crop} (${r.confidence}%)`).join(" | ");
+          resEl.textContent = rows || `Recommended crop: ${data.label}`;
+        } catch (e) { resEl.textContent = e.message; }
+      });
+    </script>
+  </body>
+</html>

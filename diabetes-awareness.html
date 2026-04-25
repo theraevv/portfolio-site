@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Early Diabetes Awareness</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .feature-card { border: 1px solid var(--line); background: #111; border-radius: 14px; padding: 1rem; }
+      .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.7rem; }
+      input, select, button { padding: 0.6rem; border-radius: 8px; border: 1px solid #303030; background: #0e0e0e; color: var(--text); font: inherit; }
+      button { width: 100%; margin-top: 0.8rem; background: #1b1b1b; cursor: pointer; }
+      .result { margin-top: 0.8rem; color: var(--accent); font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <div class="grain"></div>
+    <header class="site-header">
+      <a href="./index.html" class="brand">Your Name</a>
+      <nav class="main-nav">
+        <a href="./index.html">Home</a>
+        <a href="./projects.html">Projects</a>
+        <a href="./about.html">About</a>
+      </nav>
+    </header>
+    <main>
+      <section class="section hero">
+        <p class="tag">Featured Work</p>
+        <a href="./projects.html" class="back-btn">← Back to Projects</a>
+        <h1>Early Diabetes Awareness</h1>
+        <p class="lead">Use symptom and profile inputs to estimate diabetes risk.</p>
+      </section>
+      <section class="section">
+        <div class="feature-card">
+          <div class="grid">
+        <input id="Age" type="number" placeholder="Age (years)" />
+        <select id="Gender"><option>Male</option><option>Female</option></select>
+        <select id="Polyuria"><option>Yes</option><option>No</option></select>
+        <select id="Polydipsia"><option>Yes</option><option>No</option></select>
+        <select id="sudden weight loss"><option>Yes</option><option>No</option></select>
+        <select id="weakness"><option>Yes</option><option>No</option></select>
+        <select id="Polyphagia"><option>Yes</option><option>No</option></select>
+        <select id="Genital thrush"><option>Yes</option><option>No</option></select>
+        <select id="visual blurring"><option>Yes</option><option>No</option></select>
+        <select id="Itching"><option>Yes</option><option>No</option></select>
+        <select id="Irritability"><option>Yes</option><option>No</option></select>
+        <select id="delayed healing"><option>Yes</option><option>No</option></select>
+        <select id="partial paresis"><option>Yes</option><option>No</option></select>
+        <select id="muscle stiffness"><option>Yes</option><option>No</option></select>
+        <select id="Alopecia"><option>Yes</option><option>No</option></select>
+        <select id="Obesity"><option>Yes</option><option>No</option></select>
+          </div>
+          <button id="predictBtn">Analyze Risk</button>
+          <div id="result" class="result"></div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">© <span id="year"></span> Your Name</footer>
+    <script src="./script.js"></script>
+    <script>
+      const keys = ["Age","Gender","Polyuria","Polydipsia","sudden weight loss","weakness","Polyphagia","Genital thrush","visual blurring","Itching","Irritability","delayed healing","partial paresis","muscle stiffness","Alopecia","Obesity"];
+      document.getElementById("predictBtn").addEventListener("click", async () => {
+        const payload = {};
+        keys.forEach((k) => payload[k] = document.getElementById(k).value);
+        payload.Age = Number(payload.Age);
+        const resEl = document.getElementById("result");
+        try {
+          const res = await fetch("/api/predict/diabetes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Prediction failed");
+          resEl.textContent = `Result: ${data.label}`;
+        } catch (e) { resEl.textContent = e.message; }
+      });
+    </script>
+  </body>
+</html>

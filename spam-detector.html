@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spam Detector</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .feature-card {
+        border: 1px solid var(--line);
+        background: #111;
+        border-radius: 14px;
+        padding: 1rem;
+      }
+      .feature-card textarea {
+        width: 100%;
+        min-height: 140px;
+        padding: 0.65rem;
+        border-radius: 10px;
+        border: 1px solid #303030;
+        background: #0e0e0e;
+        color: var(--text);
+        font: inherit;
+        resize: vertical;
+      }
+      .feature-card button {
+        width: 100%;
+        margin-top: 0.8rem;
+        padding: 0.65rem;
+        border-radius: 10px;
+        border: 1px solid #303030;
+        background: #1b1b1b;
+        color: var(--text);
+        font: inherit;
+        cursor: pointer;
+      }
+      .feature-result {
+        margin-top: 0.8rem;
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .feature-result span {
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grain"></div>
+    <header class="site-header">
+      <a href="./index.html" class="brand">Your Name</a>
+      <nav class="main-nav">
+        <a href="./index.html">Home</a>
+        <a href="./projects.html">Projects</a>
+        <a href="./about.html">About</a>
+      </nav>
+    </header>
+    <main>
+      <section class="section hero">
+        <p class="tag">Featured Work</p>
+        <a href="./projects.html" class="back-btn">← Back to Projects</a>
+        <h1>Spam Detector</h1>
+        <p class="lead">
+          Paste an email or message to detect whether it is spam or ham using an
+          NLP-trained Logistic Regression model.
+        </p>
+      </section>
+      <section class="section">
+        <div class="feature-card">
+          <textarea id="message" placeholder="Paste message text here..."></textarea>
+          <button id="predictBtn">Analyze Message</button>
+          <div id="result" class="feature-result"></div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">© <span id="year"></span> Your Name</footer>
+    <script src="./script.js"></script>
+    <script>
+      document.getElementById("predictBtn").addEventListener("click", async () => {
+        const message = document.getElementById("message").value.trim();
+        const resEl = document.getElementById("result");
+
+        if (!message) {
+          resEl.textContent = "Please enter a message to analyze.";
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/predict/spam", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Analysis failed");
+
+          const label = data.label === "spam" ? "🚨 SPAM" : "✅ HAM";
+          let output = `Result: ${label}`;
+          if (typeof data.spam_score === "number") {
+            output += ` (Spam Score: ${data.spam_score.toFixed(2)})`;
+          }
+          resEl.innerHTML = output;
+        } catch (e) {
+          resEl.textContent = e.message;
+        }
+      });
+    </script>
+  </body>
+</html>
+
