@@ -1,144 +1,80 @@
 # Deployment Guide
 
-## Architecture
+## Fly.io (Recommended) — Free & Fast
 
-This project has two parts:
-1. **Frontend** (HTML/CSS/JS) → Deploy to **Cloudflare Pages**
-2. **Backend** (Flask + ML models) → Deploy to **Render.com** (free tier)
+Fly.io offers faster cold starts than Render, with VMs that keep running. The free tier includes 3 shared VMs with no sleep mode.
 
-> **Note:** Cloudflare Pages only hosts static sites. The Python Flask backend with ML models must run on a separate Python-compatible host.
+### Prerequisites
+- [Install Fly.io CLI](https://fly.io/docs/hands-on/install-flyctl/)
+- Sign up: `fly auth signup`
+- Login: `fly auth login`
 
----
-
-## Step 1: Prepare Models for Deployment
-
-Before deploying, copy ALL model files into a `models/` folder inside this project:
-
-```
-portfolio-site/
-├── models/
-│   ├── crop_model.pkl          (from C:\Projects\Websites\Crop Reco\Models\random_forest_model.pkl)
-│   ├── diabetes_model.pkl      (from C:\Projects\Websites\Earlt Stage of diabetes\model\best_rf.pkl)
-│   ├── mental_burn_model.pkl   (from C:\Projects\Websites\Mental Health\Model\random_forest_model_burn.pkl)
-│   ├── mental_dep_model.pkl    (from C:\Projects\Websites\Mental Health\Model\random_forest_model_dep.pkl)
-│   ├── mental_anx_model.pkl    (from C:\Projects\Websites\Mental Health\Model\random_forest_model_anx.pkl)
-│   └── spam_model.pkl          (model.pkl already in project root)
-```
-
-The `app.py` already uses relative paths pointing to the `models/` directory.
-
----
-
-## Step 2: Push to GitHub
+### Deploy
 
 ```bash
-# Initialize git
-git init
+# Launch the app (creates fly.toml if not present)
+fly launch --name portfolio-site --region iad
 
-# Add all files
-git add .
-
-# Commit
-git commit -m "Initial commit"
-
-# Create GitHub repo (via web or gh CLI), then push
-git remote add origin https://github.com/YOUR_USERNAME/portfolio-site.git
-git branch -M main
-git push -u origin main
+# Deploy
+fly deploy
 ```
 
-> **Tip:** Model files (`.pkl`) are large. Either:
-> - Use [Git LFS](https://git-lfs.github.com/) to track them, OR
-> - Upload them directly to your hosting platform (Render) instead of GitHub.
+Your app will be live at `https://portfolio-site.fly.dev`.
 
----
+### Update Frontend API URLs (Optional)
 
-## Step 3: Deploy Frontend to Cloudflare Pages
+If you want to use Cloudflare Pages for frontend and Fly.io for backend, update fetch URLs in the HTML files:
 
-1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) → **Pages**
-2. Click **Create a project** → **Connect to Git**
-3. Select your `portfolio-site` GitHub repository
-4. Configure build:
-   - **Framework preset:** None
-   - **Build command:** (leave empty)
-   - **Build output directory:** `/`
-5. Click **Save and Deploy**
-
-Your static site will be live at `https://portfolio-site.pages.dev`
-
----
-
-## Step 4: Deploy Backend to Render.com
-
-1. Go to [render.com](https://render.com) and sign up (free)
-2. Click **New +** → **Web Service**
-3. Connect your GitHub repo
-4. Configure:
-   - **Runtime:** Python 3
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `gunicorn app:app`
-   - **Plan:** Free
-5. Add environment variable if needed: `PYTHON_VERSION=3.9`
-6. Click **Create Web Service**
-
-Your API will be live at `https://portfolio-api.onrender.com` (example URL).
-
-> **Note:** Add `gunicorn` to `requirements.txt` before deploying:
-> ```
-> flask
-> gunicorn
-> joblib
-> scikit-learn
-> pandas
-> numpy
-> ```
-
----
-
-## Step 5: Update Frontend API URLs
-
-After both are deployed, update the JavaScript `fetch` calls in each project page to use your Render backend URL instead of relative paths:
-
-**Before:**
 ```javascript
+// From:
 fetch("/api/predict/spam", ...)
+
+// To:
+fetch("https://portfolio-site.fly.dev/api/predict/spam", ...)
 ```
 
-**After:**
-```javascript
-fetch("https://your-app.onrender.com/api/predict/spam", ...)
-```
-
-Update in:
-- `crop-reco.html`
-- `diabetes-awareness.html`
-- `mental-health-awareness.html`
-- `spam-detector.html`
-
-Then commit and push — Cloudflare Pages will auto-redeploy.
+Otherwise, keep relative paths for single-domain deployment.
 
 ---
 
-## Alternative: All-in-One on Render
+## Cloudflare Pages (Frontend Only)
 
-If you prefer a simpler setup, you can deploy **both frontend and backend** on Render as a single Flask app:
+For serving static HTML/CSS/JS only (no ML backend):
 
-1. Render serves the static files via Flask (`send_from_directory`)
-2. The API endpoints work on the same domain
-3. No need to update fetch URLs or use Cloudflare Pages
-
-To do this, just deploy the entire repo to Render as a Python Web Service. The app.py already handles static file serving.
+1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) → Pages
+2. Create project → Connect GitHub repo
+3. Framework preset: **None**
+4. Build command: *(empty)*
+5. Build output directory: `/`
+6. Deploy
 
 ---
 
-## Quick Checklist
+## Render.com (Alternative)
 
-- [ ] Copy all `.pkl` model files into `models/` folder
-- [ ] Add `gunicorn` to `requirements.txt`
-- [ ] Commit and push to GitHub
-- [ ] Deploy frontend to Cloudflare Pages
-- [ ] Deploy backend to Render.com
-- [ ] Update fetch URLs in HTML files to point to Render backend
-- [ ] Commit, push, and verify
+1. Go to [render.com](https://render.com)
+2. New Web Service → Connect GitHub repo
+3. Settings:
+   - Runtime: Python 3
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn app:app`
+   - Plan: Free
+4. Upload model files to `models/` directory via Shell tab
 
+---
+
+## Model Files
+
+The following models must be present in the `models/` directory:
+
+| File | Source |
+|------|--------|
+| `crop_model.pkl` | Crop Recommendation RF model |
+| `diabetes_model.pkl` | Diabetes Awareness RF model |
+| `mental_burn_model.pkl` | Mental Health Burnout RF model |
+| `mental_dep_model.pkl` | Mental Health Depression RF model |
+| `mental_anx_model.pkl` | Mental Health Anxiety RF model |
+| `spam_model.pkl` | Spam/Ham Logistic Regression model |
+
+> Note: Model files are large and gitignored. Upload them directly to your hosting platform.
 
