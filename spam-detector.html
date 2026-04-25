@@ -74,6 +74,7 @@
     </main>
     <footer class="site-footer">© <span id="year"></span> Your Name</footer>
     <script src="./script.js"></script>
+    <script src="./config.js"></script>
     <script>
       document.getElementById("predictBtn").addEventListener("click", async () => {
         const message = document.getElementById("message").value.trim();
@@ -85,7 +86,7 @@
         }
 
         try {
-          const res = await fetch("/api/predict/spam", {
+          const res = await fetch(`${API_BASE}/api/predict/spam`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message })

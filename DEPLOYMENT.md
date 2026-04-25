@@ -1,80 +1,71 @@
-# Deployment Guide
+# Vercel Deployment Guide
 
-## Fly.io (Recommended) — Free & Fast
+## Option 1: Vercel + Serverless Functions (Recommended)
 
-Fly.io offers faster cold starts than Render, with VMs that keep running. The free tier includes 3 shared VMs with no sleep mode.
+Vercel supports Python serverless functions, allowing you to run your Flask backend as API routes.
 
-### Prerequisites
-- [Install Fly.io CLI](https://fly.io/docs/hands-on/install-flyctl/)
-- Sign up: `fly auth signup`
-- Login: `fly auth login`
+### Project Structure for Vercel
 
-### Deploy
-
-```bash
-# Launch the app (creates fly.toml if not present)
-fly launch --name portfolio-site --region iad
-
-# Deploy
-fly deploy
+```
+portfolio-site/
+├── api/
+│   └── index.py          # Main API handler
+├── static/               # HTML, CSS, JS files
+│   ├── index.html
+│   ├── styles.css
+│   └── ...
+├── models/               # .pkl model files
+│   ├── spam_model.pkl
+│   └── ...
+├── requirements.txt
+└── vercel.json
 ```
 
-Your app will be live at `https://portfolio-site.fly.dev`.
+### Steps
 
-### Update Frontend API URLs (Optional)
+1. **Install Vercel CLI**
+   ```bash
+   npm i -g vercel
+   ```
 
-If you want to use Cloudflare Pages for frontend and Fly.io for backend, update fetch URLs in the HTML files:
+2. **Restructure for Vercel**
+   - Move all HTML/CSS/JS to a `static/` folder
+   - Create `api/index.py` as the entry point
+   - Create `vercel.json` config
 
-```javascript
-// From:
-fetch("/api/predict/spam", ...)
+3. **Deploy**
+   ```bash
+   vercel
+   ```
 
-// To:
-fetch("https://portfolio-site.fly.dev/api/predict/spam", ...)
-```
+## Option 2: Static Frontend Only (No ML Backend)
 
-Otherwise, keep relative paths for single-domain deployment.
+If you only need the frontend without ML predictions:
 
----
+1. Connect your GitHub repo to [vercel.com](https://vercel.com)
+2. Framework preset: **Other**
+3. Build command: *(empty)*
+4. Output directory: `/` (root)
+5. Deploy
 
-## Cloudflare Pages (Frontend Only)
+The frontend will work but API calls will fail.
 
-For serving static HTML/CSS/JS only (no ML backend):
+## Option 3: Vercel Frontend + Render Backend
 
-1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) → Pages
-2. Create project → Connect GitHub repo
-3. Framework preset: **None**
-4. Build command: *(empty)*
-5. Build output directory: `/`
-6. Deploy
+1. **Frontend on Vercel:**
+   - Deploy static files to Vercel
+   - Update `config.js` with your Render backend URL:
+     ```javascript
+     const API_BASE = "https://your-app.onrender.com";
+     ```
 
----
+2. **Backend on Render:**
+   - Deploy Flask app to [render.com](https://render.com)
+   - Upload model files to `models/` directory
 
-## Render.com (Alternative)
+## Current Setup
 
-1. Go to [render.com](https://render.com)
-2. New Web Service → Connect GitHub repo
-3. Settings:
-   - Runtime: Python 3
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn app:app`
-   - Plan: Free
-4. Upload model files to `models/` directory via Shell tab
-
----
-
-## Model Files
-
-The following models must be present in the `models/` directory:
-
-| File | Source |
-|------|--------|
-| `crop_model.pkl` | Crop Recommendation RF model |
-| `diabetes_model.pkl` | Diabetes Awareness RF model |
-| `mental_burn_model.pkl` | Mental Health Burnout RF model |
-| `mental_dep_model.pkl` | Mental Health Depression RF model |
-| `mental_anx_model.pkl` | Mental Health Anxiety RF model |
-| `spam_model.pkl` | Spam/Ham Logistic Regression model |
-
-> Note: Model files are large and gitignored. Upload them directly to your hosting platform.
-
+This project is currently configured for **Option 3**:
+- `config.js` has `API_BASE = ""` (same-origin)
+- `app.py` has CORS enabled for cross-origin requests
+- Update `config.js` when deploying frontend and backend separately

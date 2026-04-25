@@ -6,8 +6,10 @@ import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import HashingVectorizer
 from flask import Flask, jsonify, request, send_from_directory
+from flask_cors import CORS
 
 app = Flask(__name__, static_folder=".", static_url_path="")
+CORS(app, origins=["*"])
 
 MODELS_DIR = os.path.join(os.path.dirname(__file__), "models")
 CROP_MODEL_PATH = os.path.join(MODELS_DIR, "crop_model.pkl")

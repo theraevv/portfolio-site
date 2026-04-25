@@ -55,6 +55,7 @@
     </main>
     <footer class="site-footer">© <span id="year"></span> Your Name</footer>
     <script src="./script.js"></script>
+    <script src="./config.js"></script>
     <script>
       const fields = ["Age","Gender","Occupation","Daily_Screen_Time","Social_Media_Usage","Night_Usage","Sleep_Hours","Stress_Level","Work_Study_Hours","Physical_Activity","Social_Interaction_Score","Caffeine_Intake","Smoking","Alcohol"];
       document.getElementById("predictBtn").addEventListener("click", async () => {
@@ -66,7 +67,7 @@
         payload.Alcohol = document.getElementById("Alcohol").value === "Yes" ? 1 : 0;
         const resEl = document.getElementById("result");
         try {
-          const res = await fetch("/api/predict/mental", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+          const res = await fetch(`${API_BASE}/api/predict/mental`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Prediction failed");
           const toYesNo = (v) => v === 1 || v === "1" ? "Yes" : "No";

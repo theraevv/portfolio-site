@@ -57,6 +57,7 @@
     </main>
     <footer class="site-footer">© <span id="year"></span> Your Name</footer>
     <script src="./script.js"></script>
+    <script src="./config.js"></script>
     <script>
       const keys = ["Age","Gender","Polyuria","Polydipsia","sudden weight loss","weakness","Polyphagia","Genital thrush","visual blurring","Itching","Irritability","delayed healing","partial paresis","muscle stiffness","Alopecia","Obesity"];
       document.getElementById("predictBtn").addEventListener("click", async () => {
@@ -65,7 +66,7 @@
         payload.Age = Number(payload.Age);
         const resEl = document.getElementById("result");
         try {
-          const res = await fetch("/api/predict/diabetes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+          const res = await fetch(`${API_BASE}/api/predict/diabetes`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Prediction failed");
           resEl.textContent = `Result: ${data.label}`;

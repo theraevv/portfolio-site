@@ -48,6 +48,7 @@
     </main>
     <footer class="site-footer">© <span id="year"></span> Your Name</footer>
     <script src="./script.js"></script>
+    <script src="./config.js"></script>
     <script>
       document.getElementById("predictBtn").addEventListener("click", async () => {
         const payload = {
@@ -61,7 +62,7 @@
         };
         const resEl = document.getElementById("result");
         try {
-          const res = await fetch("/api/predict", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+          const res = await fetch(`${API_BASE}/api/predict`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Prediction failed");
           const rows = (data.results || []).map((r, i) => `#${i + 1} ${r.crop} (${r.confidence}%)`).join(" | ");
