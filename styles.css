@@ -304,8 +304,8 @@ button:hover {
 
 .crop-form input,
 .crop-form select {
-  border: 1px solid #303030;
-  background: #0e0e0e;
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
   color: var(--text);
   border-radius: 10px;
   padding: 0.55rem 0.65rem;
@@ -313,8 +313,8 @@ button:hover {
 }
 
 .crop-form textarea {
-  border: 1px solid #303030;
-  background: #0e0e0e;
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
   color: var(--text);
   border-radius: 10px;
   padding: 0.55rem 0.65rem;
@@ -325,7 +325,7 @@ button:hover {
 .predict-btn {
   grid-column: 1 / -1;
   border: 1px solid var(--line);
-  background: #1b1b1b;
+  background: linear-gradient(145deg, var(--button-bg), var(--button-bg-dark));
   color: var(--text);
   border-radius: 11px;
   padding: 0.65rem;
@@ -338,13 +338,13 @@ button:hover {
   border-radius: 12px;
   padding: 0.8rem;
   color: var(--accent);
-  background: #0f0f0f;
+  background: var(--card);
 }
 
 .chat-window {
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #0e0e0e;
+  background: var(--card);
   padding: 0.8rem;
   min-height: 100px;
   margin-bottom: 0.75rem;
@@ -361,13 +361,13 @@ button:hover {
 
 .chat-bubble.user {
   margin-left: auto;
-  background: #242424;
+  background: var(--bg-soft);
 }
 
 .chat-bubble.bot {
-  background: #1a1a1a;
-  border: 1px solid #2e2e2e;
-  color: var(--muted);
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--text);
 }
 
 .chat-form {
@@ -389,7 +389,7 @@ button:hover {
   width: min(460px, 100%);
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: #121212;
+  background: var(--card);
   padding: 1rem;
 }
 
@@ -413,7 +413,7 @@ button:hover {
   margin: 0;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: #111;
+  background: var(--card);
   color: var(--muted);
   padding: 1rem;
 }
