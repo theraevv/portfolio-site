@@ -143,6 +143,7 @@ h2 {
 .cards-grid {
   display: grid;
   gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .project-card {
@@ -367,5 +368,13 @@ h2 {
 @media (max-width: 720px) {
   .main-nav {
     gap: 0.7rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .project-link-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }
