@@ -6,13 +6,13 @@
     <title>Early Diabetes Awareness</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
-      .feature-card { border: 1px solid var(--line); background: #111; border-radius: 14px; padding: 1rem; }
+      .feature-card { border: 1px solid var(--line); background: var(--card); border-radius: 14px; padding: 1rem; }
       .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.7rem; }
       .form-field { display: grid; gap: 0.35rem; }
       .form-field span { color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; }
-      input, select, button { padding: 0.6rem; border-radius: 8px; border: 1px solid #303030; background: #0e0e0e; color: var(--text); font: inherit; }
+      input, select, button { padding: 0.6rem; border-radius: 8px; border: 1px solid var(--line); background: var(--bg-soft); color: var(--text); font: inherit; }
       input, select { min-width: 0; }
-      button { width: 100%; margin-top: 0.8rem; background: #1b1b1b; cursor: pointer; }
+      button { width: 100%; margin-top: 0.8rem; background: linear-gradient(145deg, var(--button-bg), var(--button-bg-dark)); cursor: pointer; }
       .result { margin-top: 0.8rem; color: var(--accent); font-weight: 600; }
       @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
     </style>
@@ -20,7 +20,7 @@
   <body>
     <div class="grain"></div>
     <header class="site-header">
-      <a href="./index.html" class="brand">raev-folio</a>
+      <a href="./index.html" class="brand">raevfolio</a>
       <nav class="main-nav">
         <a href="./index.html">Home</a>
         <a href="./projects.html">Projects</a>
@@ -61,7 +61,7 @@
         </div>
       </section>
     </main>
-    <footer class="site-footer">© <span id="year"></span> raev-folio</footer>
+    <footer class="site-footer">© <span id="year"></span> raevfolio</footer>
     <script src="./script.js"></script>
     <script src="./config.js"></script>
     <script>
