@@ -22,6 +22,7 @@
         <a href="./projects.html">Projects</a>
         <a href="./about.html">About</a>
       </nav>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">Light</button>
     </header>
     <main>
       <section class="section hero">
@@ -29,17 +30,18 @@
         <a href="./projects.html" class="back-btn">← Back to Projects</a>
         <h1>Crop Recommendation</h1>
         <p class="lead">Predict top crops from soil and climate features.</p>
+        <p class="lead">The model uses soil nutrients, temperature, humidity, pH, and rainfall to suggest crops that have historically done well under similar conditions.</p>
       </section>
       <section class="section">
         <div class="feature-card">
           <div class="feature-grid">
-            <input id="N" type="number" placeholder="Nitrogen (N)" />
-            <input id="P" type="number" placeholder="Phosphorus (P)" />
-            <input id="K" type="number" placeholder="Potassium (K)" />
-            <input id="temperature" type="number" step="0.1" placeholder="Temperature (C)" />
-            <input id="humidity" type="number" step="0.1" placeholder="Humidity (%)" />
-            <input id="ph" type="number" step="0.1" placeholder="pH" />
-            <input id="rainfall" type="number" step="0.1" placeholder="Rainfall (mm)" />
+            <label><span>Nitrogen (N)</span><input id="N" type="number" placeholder="Nitrogen (N)" /></label>
+            <label><span>Phosphorus (P)</span><input id="P" type="number" placeholder="Phosphorus (P)" /></label>
+            <label><span>Potassium (K)</span><input id="K" type="number" placeholder="Potassium (K)" /></label>
+            <label><span>Temperature (C)</span><input id="temperature" type="number" step="0.1" placeholder="Temperature (C)" /></label>
+            <label><span>Humidity (%)</span><input id="humidity" type="number" step="0.1" placeholder="Humidity (%)" /></label>
+            <label><span>Soil pH</span><input id="ph" type="number" step="0.1" placeholder="pH" /></label>
+            <label><span>Rainfall (mm)</span><input id="rainfall" type="number" step="0.1" placeholder="Rainfall (mm)" /></label>
           </div>
           <button id="predictBtn">Recommend Crop</button>
           <div id="result" class="feature-result"></div>

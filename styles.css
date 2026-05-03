@@ -9,6 +9,16 @@
   --radius: 18px;
 }
 
+body.light {
+  --bg: #f4f5f7;
+  --bg-soft: #ffffff;
+  --card: #f7f8fb;
+  --line: #dfe3e8;
+  --text: #111827;
+  --muted: #6b7280;
+  --accent: #1d4ed8;
+}
+
 *,
 *::before,
 *::after {
@@ -73,6 +83,20 @@ body {
   color: var(--text);
 }
 
+.theme-toggle {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+}
+
 main {
   width: min(1080px, 100% - 2rem);
   margin-inline: auto;
@@ -132,13 +156,10 @@ h2 {
   font-weight: 500;
   font-size: 0.95rem;
   letter-spacing: 0.02em;
-  transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .cta:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   border-color: var(--accent);
 }
 
@@ -176,11 +197,9 @@ h2 {
   align-items: center;
   text-decoration: none;
   color: var(--text);
-  transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
 .project-link-card:hover {
-  transform: translateY(-2px);
   border-color: #3a3a3a;
 }
 
@@ -225,13 +244,11 @@ h2 {
   font-weight: 500;
   letter-spacing: 0.02em;
   background: rgba(216, 216, 216, 0.05);
-  transition: all 0.2s ease;
 }
 
 .pill:hover {
   background: rgba(216, 216, 216, 0.1);
   border-color: var(--accent);
-  transform: translateY(-1px);
 }
 
 button {
