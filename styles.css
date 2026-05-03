@@ -45,7 +45,7 @@ body {
   font-weight: 400;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   color: var(--text);
-  background: radial-gradient(circle at 20% 10%, #1b1b1b 0%, var(--bg) 55%);
+  background: var(--bg);
   min-height: 100vh;
   line-height: 1.6;
 }
