@@ -110,6 +110,16 @@ def load_module_from_path(name, path):
         return None, f"Failed to load module: {exc}. Install missing Python dependencies with `pip install -r requirements.txt`." 
 
 
+def fallback_pre_process(text):
+    if not isinstance(text, str):
+        return ""
+    text = text.lower()
+    text = re.sub(r'http\S+|www\S+|https\S+', '', text)
+    text = re.sub(r'@\w+', '', text)
+    text = re.sub(r'\d+', '', text)
+    text = re.sub(r'[^\w\s]', ' ', text)
+
+
 crop_model, crop_model_error = load_model(CROP_MODEL_PATH)
 diabetes_model, diabetes_model_error = load_model(DIABETES_MODEL_PATH)
 mental_burn_model, mental_burn_model_error = load_model(MENTAL_BURN_MODEL_PATH)
@@ -315,8 +325,6 @@ def predict_sentiment():
         return jsonify({"error": news_sentiment_model_error}), 500
     if news_tfidf_vectorizer is None:
         return jsonify({"error": news_tfidf_vectorizer_error}), 500
-    if news_preprocess_module is None:
-        return jsonify({"error": news_preprocess_error}), 500
 
     payload = request.get_json(silent=True) or {}
     text = str(payload.get("text", "")).strip()
@@ -324,7 +332,11 @@ def predict_sentiment():
         return jsonify({"error": "Text is required."}), 400
 
     try:
-        cleaned = news_preprocess_module.pre_process(text)
+        preprocess_fn = getattr(news_preprocess_module, "pre_process", None) if news_preprocess_module is not None else None
+        if preprocess_fn is None:
+            preprocess_fn = fallback_pre_process
+
+        cleaned = preprocess_fn(text)
         vector = news_tfidf_vectorizer.transform([cleaned])
         prediction = news_sentiment_model.predict(vector)[0]
         if isinstance(prediction, int):
@@ -340,6 +352,8 @@ def predict_sentiment():
         response = {"label": label}
         if confidence is not None:
             response["confidence"] = confidence
+        if news_preprocess_module is None:
+            response["warning"] = "Using fallback preprocessing because sentiment preprocess module could not be loaded."
         return jsonify(response)
     except Exception as exc:
         return jsonify({"error": f"Model prediction failed: {str(exc)}"}), 500
