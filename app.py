@@ -107,7 +107,7 @@ def load_module_from_path(name, path):
         spec.loader.exec_module(module)
         return module, None
     except Exception as exc:
-        return None, f"Failed to load module: {exc}"
+        return None, f"Failed to load module: {exc}. Install missing Python dependencies with `pip install -r requirements.txt`." 
 
 
 crop_model, crop_model_error = load_model(CROP_MODEL_PATH)
