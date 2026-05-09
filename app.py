@@ -118,6 +118,8 @@ def fallback_pre_process(text):
     text = re.sub(r'@\w+', '', text)
     text = re.sub(r'\d+', '', text)
     text = re.sub(r'[^\w\s]', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
 
 
 crop_model, crop_model_error = load_model(CROP_MODEL_PATH)
@@ -337,6 +339,8 @@ def predict_sentiment():
             preprocess_fn = fallback_pre_process
 
         cleaned = preprocess_fn(text)
+        if not isinstance(cleaned, str):
+            cleaned = ""
         vector = news_tfidf_vectorizer.transform([cleaned])
         prediction = news_sentiment_model.predict(vector)[0]
         if isinstance(prediction, int):
