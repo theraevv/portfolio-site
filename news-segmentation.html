@@ -198,8 +198,8 @@
     <footer class="site-footer">© <span id="year"></span> raevfolio</footer>
 
     <script src="./script.js"></script>
+    <script src="./config.js"></script>
     <script>
-      // Sentiment analysis demonstration
       const analyzeBtn = document.getElementById('analyzeBtn');
       const textInput = document.getElementById('text-input');
       const resultDiv = document.getElementById('result');
@@ -207,74 +207,60 @@
       const sentimentConfidence = document.getElementById('sentiment-confidence');
       const sentimentExplanation = document.getElementById('sentiment-explanation');
 
-      // Simple keyword-based sentiment for demonstration
-      function analyzeLocalSentiment(text) {
-        const lowerText = text.toLowerCase();
-        
-        const positiveWords = ['good', 'great', 'excellent', 'positive', 'gain', 'rise', 'increase', 'bull', 'strong', 'growth', 'profit', 'win', 'success'];
-        const negativeWords = ['bad', 'poor', 'negative', 'loss', 'fall', 'decrease', 'bear', 'weak', 'decline', 'fail', 'crisis', 'risk'];
-        
-        const positiveCount = positiveWords.filter(word => lowerText.includes(word)).length;
-        const negativeCount = negativeWords.filter(word => lowerText.includes(word)).length;
-        const totalCount = positiveCount + negativeCount;
-
-        let sentiment = 'Neutral';
-        if (positiveCount > negativeCount && positiveCount > 0) {
-          sentiment = 'Positive';
-        } else if (negativeCount > positiveCount && negativeCount > 0) {
-          sentiment = 'Negative';
+      async function requestSentiment(text) {
+        const response = await fetch(`${API_BASE}/api/predict/sentiment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Analysis failed.');
         }
-
-        let confidence = 0.58;
-        if (totalCount > 0) {
-          const diff = Math.abs(positiveCount - negativeCount);
-          confidence = 0.55 + Math.min(0.35, diff / totalCount * 0.4 + Math.min(totalCount, 4) * 0.05);
-        }
-        if (sentiment === 'Neutral' && totalCount === 0) {
-          confidence = 0.60;
-        }
-
-        return {
-          sentiment,
-          confidence: Math.round(Math.min(0.95, confidence) * 100)
-        };
+        return data;
       }
 
-      analyzeBtn.addEventListener('click', () => {
+      analyzeBtn.addEventListener('click', async () => {
         const text = textInput.value.trim();
-        
         if (!text) {
           alert('Please paste some text to analyze.');
           return;
         }
 
-        // Simulate a brief delay for UX
         analyzeBtn.textContent = 'Analyzing...';
         analyzeBtn.disabled = true;
+        sentimentExplanation.textContent = '';
+        sentimentLabel.textContent = '';
+        sentimentConfidence.textContent = '';
+        resultDiv.classList.remove('show');
 
-        setTimeout(() => {
-          const { sentiment, confidence } = analyzeLocalSentiment(text);
-          
-          sentimentLabel.textContent = sentiment;
-          sentimentLabel.className = 'sentiment-label sentiment-' + sentiment.toLowerCase();
-          sentimentConfidence.textContent = `Confidence: ${confidence}%`;
-          sentimentConfidence.className = 'sentiment-confidence sentiment-' + sentiment.toLowerCase();
-          
+        try {
+          const data = await requestSentiment(text);
+          const label = data.label || 'Neutral';
+          const confidenceText = data.confidence != null ? `Confidence: ${data.confidence}%` : '';
+
+          sentimentLabel.textContent = label;
+          sentimentLabel.className = 'sentiment-label sentiment-' + label.toLowerCase();
+          sentimentConfidence.textContent = confidenceText;
+          sentimentConfidence.className = 'sentiment-confidence sentiment-' + label.toLowerCase();
+
           const explanations = {
             'Positive': 'This text contains positive language and optimistic tone. In financial contexts, this suggests bullish sentiment.',
             'Negative': 'This text contains negative language and pessimistic tone. In financial contexts, this suggests bearish sentiment.',
             'Neutral': 'This text is factual and neutral in tone. It presents information without strong emotional language.'
           };
-          
-          sentimentExplanation.textContent = explanations[sentiment] || 'Analysis complete.';
-          
+
+          sentimentExplanation.textContent = explanations[label] || 'Analysis complete.';
           resultDiv.classList.add('show');
+        } catch (error) {
+          sentimentExplanation.textContent = error.message;
+          resultDiv.classList.add('show');
+        } finally {
           analyzeBtn.textContent = 'Analyze Sentiment';
           analyzeBtn.disabled = false;
-        }, 500);
+        }
       });
 
-      // Allow Enter key to submit
       textInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && e.ctrlKey) {
           analyzeBtn.click();

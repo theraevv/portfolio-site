@@ -1,3 +1,4 @@
+import importlib.util
 import os
 import re
 
@@ -18,6 +19,15 @@ MENTAL_BURN_MODEL_PATH = os.path.join(MODELS_DIR, "mental_burn_model.pkl")
 MENTAL_DEP_MODEL_PATH = os.path.join(MODELS_DIR, "mental_dep_model.pkl")
 MENTAL_ANX_MODEL_PATH = os.path.join(MODELS_DIR, "mental_anx_model.pkl")
 SPAM_MODEL_PATH = os.path.join(MODELS_DIR, "spam_model.pkl")
+NEWS_SENTIMENT_DIR = os.path.join(MODELS_DIR, "news-segmentation")
+NEWS_MODEL_PATH = os.path.join(NEWS_SENTIMENT_DIR, "sentiment_model.pkl")
+NEWS_VECTORIZER_PATH = os.path.join(NEWS_SENTIMENT_DIR, "tfidf_vectorizer.pkl")
+NEWS_PREPROCESS_PATH = os.path.join(NEWS_SENTIMENT_DIR, "nlp_preprocess.py")
+NEWS_LABEL_MAP = {
+    0: "Negative",
+    1: "Neutral",
+    2: "Positive",
+}
 
 CROP_FEATURE_ORDER = ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]
 DIABETES_FEATURE_ORDER = [
@@ -88,12 +98,29 @@ def load_model(path):
         return None, f"Failed to load model: {exc}"
 
 
+def load_module_from_path(name, path):
+    if not os.path.exists(path):
+        return None, f"Module file not found: {path}"
+    try:
+        spec = importlib.util.spec_from_file_location(name, path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module, None
+    except Exception as exc:
+        return None, f"Failed to load module: {exc}"
+
+
 crop_model, crop_model_error = load_model(CROP_MODEL_PATH)
 diabetes_model, diabetes_model_error = load_model(DIABETES_MODEL_PATH)
 mental_burn_model, mental_burn_model_error = load_model(MENTAL_BURN_MODEL_PATH)
 mental_dep_model, mental_dep_model_error = load_model(MENTAL_DEP_MODEL_PATH)
 mental_anx_model, mental_anx_model_error = load_model(MENTAL_ANX_MODEL_PATH)
 spam_model, spam_model_error = load_model(SPAM_MODEL_PATH)
+news_sentiment_model, news_sentiment_model_error = load_model(NEWS_MODEL_PATH)
+news_tfidf_vectorizer, news_tfidf_vectorizer_error = load_model(NEWS_VECTORIZER_PATH)
+news_preprocess_module, news_preprocess_error = load_module_from_path(
+    "news_sentiment_preprocess", NEWS_PREPROCESS_PATH
+)
 
 expected_features = getattr(spam_model, "n_features_in_", None)
 spam_vectorizer = None
@@ -280,6 +307,42 @@ def predict_mental():
             "anxiety": str(anxiety)
         }
     )
+
+
+@app.post("/api/predict/sentiment")
+def predict_sentiment():
+    if news_sentiment_model is None:
+        return jsonify({"error": news_sentiment_model_error}), 500
+    if news_tfidf_vectorizer is None:
+        return jsonify({"error": news_tfidf_vectorizer_error}), 500
+    if news_preprocess_module is None:
+        return jsonify({"error": news_preprocess_error}), 500
+
+    payload = request.get_json(silent=True) or {}
+    text = str(payload.get("text", "")).strip()
+    if not text:
+        return jsonify({"error": "Text is required."}), 400
+
+    try:
+        cleaned = news_preprocess_module.pre_process(text)
+        vector = news_tfidf_vectorizer.transform([cleaned])
+        prediction = news_sentiment_model.predict(vector)[0]
+        if isinstance(prediction, int):
+            label = NEWS_LABEL_MAP.get(prediction, str(prediction).title())
+        else:
+            label = str(prediction).title()
+
+        confidence = None
+        if hasattr(news_sentiment_model, "predict_proba"):
+            probabilities = news_sentiment_model.predict_proba(vector)[0]
+            confidence = round(float(max(probabilities)) * 100, 1)
+
+        response = {"label": label}
+        if confidence is not None:
+            response["confidence"] = confidence
+        return jsonify(response)
+    except Exception as exc:
+        return jsonify({"error": f"Model prediction failed: {str(exc)}"}), 500
 
 
 @app.post("/api/predict/spam")
