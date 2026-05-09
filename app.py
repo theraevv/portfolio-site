@@ -343,10 +343,15 @@ def predict_sentiment():
             cleaned = ""
         vector = news_tfidf_vectorizer.transform([cleaned])
         prediction = news_sentiment_model.predict(vector)[0]
+
         if isinstance(prediction, int):
             label = NEWS_LABEL_MAP.get(prediction, str(prediction).title())
         else:
-            label = str(prediction).title()
+            prediction_text = str(prediction).strip()
+            if prediction_text.isdigit():
+                label = NEWS_LABEL_MAP.get(int(prediction_text), prediction_text.title())
+            else:
+                label = prediction_text.title()
 
         confidence = None
         if hasattr(news_sentiment_model, "predict_proba"):
