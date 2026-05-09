@@ -119,7 +119,31 @@ def fallback_pre_process(text):
     text = re.sub(r'\d+', '', text)
     text = re.sub(r'[^\w\s]', ' ', text)
     text = re.sub(r'\s+', ' ', text).strip()
-    return text
+
+    stopwords = {
+        'the','and','for','with','that','this','have','from','are','was','were','but','not','you','your',
+        'our','they','them','his','her','she','he','its','it','on','in','at','by','an','a','of','to','as',
+        'is','be','been','being','do','does','did','so','if','or','just','about','out','up','into','more',
+        'all','we','what','when','where','who','why','how','which','would','could','should','there','here',
+        'their','than','then','also','may','can','will','over','after','before','because','while','while'
+    }
+
+    tokens = [tok for tok in text.split() if len(tok) > 2 and tok not in stopwords]
+    normalized = []
+    for tok in tokens:
+        if tok.endswith('ies'):
+            tok = tok[:-3] + 'y'
+        elif tok.endswith('ing'):
+            tok = tok[:-3]
+        elif tok.endswith('ed'):
+            tok = tok[:-2]
+        elif tok.endswith('es') and len(tok) > 4:
+            tok = tok[:-2]
+        elif tok.endswith('s') and len(tok) > 3:
+            tok = tok[:-1]
+        normalized.append(tok)
+
+    return ' '.join(normalized).strip()
 
 
 crop_model, crop_model_error = load_model(CROP_MODEL_PATH)
