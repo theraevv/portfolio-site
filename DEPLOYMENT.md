@@ -74,6 +74,8 @@ This repository now includes a Streamlit app entrypoint at `stock_viewer.py`.
 
 Once deployed, the Stock Viewer app will be publicly viewable.
 
+> Note: The portfolio site is deployed as a static site on Vercel. Python files and Streamlit app files are excluded from the Vercel build using `.vercelignore`.
+
 ## Current Setup
 
 This project is currently configured for **Option 3**:

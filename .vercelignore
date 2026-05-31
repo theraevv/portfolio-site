@@ -1,0 +1,10 @@
+# Ignore Python and local Streamlit app files
+requirements.txt
+stock viewer.py
+stock_viewer.py
+app.py
+run_streamlit_tunnel.py
+Procfile
+models/
+*.pyc
+__pycache__/
