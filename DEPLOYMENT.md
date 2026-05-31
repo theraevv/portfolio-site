@@ -63,6 +63,17 @@ The frontend will work but API calls will fail.
    - Deploy Flask app to [render.com](https://render.com)
    - Upload model files to `models/` directory
 
+## Option 4: Streamlit Cloud for Stock Viewer
+
+This repository now includes a Streamlit app entrypoint at `stock_viewer.py`.
+
+1. Go to [streamlit.io/cloud](https://streamlit.io/cloud).
+2. Connect your GitHub repository.
+3. Set the app file to `stock_viewer.py`.
+4. Deploy and open the public URL.
+
+Once deployed, the Stock Viewer app will be publicly viewable.
+
 ## Current Setup
 
 This project is currently configured for **Option 3**:

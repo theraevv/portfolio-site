@@ -6,3 +6,7 @@ scikit-learn
 pandas
 numpy
 nltk
+streamlit
+yfinance
+matplotlib
+seaborn
