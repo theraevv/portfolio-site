@@ -72,9 +72,7 @@
         payload.Age = Number(payload.Age);
         const resEl = document.getElementById("result");
         try {
-          const res = await fetch(`${API_BASE}/api/predict/diabetes`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "Prediction failed");
+          const data = await safeFetch(`${API_BASE}/api/predict/diabetes`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
           resEl.textContent = `Result: ${data.label}`;
         } catch (e) { resEl.textContent = e.message; }
       });

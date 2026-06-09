@@ -91,13 +91,11 @@
         }
 
         try {
-          const res = await fetch(`${API_BASE}/api/predict/spam`, {
+          const data = await safeFetch(`${API_BASE}/api/predict/spam`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message })
           });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "Analysis failed");
 
           const label = data.label === "spam" ? "🚨 SPAM" : "✅ HAM";
           let output = `Result: ${label}`;

@@ -73,9 +73,7 @@
         payload.Alcohol = document.getElementById("Alcohol").value === "Yes" ? 1 : 0;
         const resEl = document.getElementById("result");
         try {
-          const res = await fetch(`${API_BASE}/api/predict/mental`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "Prediction failed");
+          const data = await safeFetch(`${API_BASE}/api/predict/mental`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
           const toYesNo = (v) => v === 1 || v === "1" ? "Yes" : "No";
           resEl.textContent = `Depression: ${toYesNo(data.depression)} | Anxiety: ${toYesNo(data.anxiety)} | Burnout: ${toYesNo(data.burnout)}`;
         } catch (e) { resEl.textContent = e.message; }

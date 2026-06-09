@@ -25,3 +25,16 @@ if (themeToggle) {
   });
 }
 
+// Safe JSON fetch helper: throws a clear error when response isn't JSON.
+window.safeFetch = async function (input, init) {
+  const res = await fetch(input, init);
+  const ct = res.headers.get("content-type") || "";
+  if (ct.includes("application/json")) {
+    const data = await res.json();
+    if (!res.ok) throw new Error(data && data.error ? data.error : JSON.stringify(data));
+    return data;
+  }
+  const text = await res.text();
+  throw new Error(`Non-JSON response (${res.status}): ${text}`);
+};
+

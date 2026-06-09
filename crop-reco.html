@@ -64,9 +64,7 @@
         };
         const resEl = document.getElementById("result");
         try {
-          const res = await fetch(`${API_BASE}/api/predict`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "Prediction failed");
+          const data = await safeFetch(`${API_BASE}/api/predict`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
           const rows = (data.results || []).map((r, i) => `#${i + 1} ${r.crop} (${r.confidence}%)`).join(" | ");
           resEl.textContent = rows || `Recommended crop: ${data.label}`;
         } catch (e) { resEl.textContent = e.message; }
