@@ -212,6 +212,22 @@ h2 {
   border-color: rgba(100,140,255,0.25);
 }
 
+.hover-card div {
+  max-width: calc(100% - 90px);
+}
+
+.card-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  line-height: 1.15;
+}
+
+.card-desc {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .project-link-card {
   border: 1px solid var(--line);
   background: linear-gradient(180deg, var(--card), var(--card-dark));
